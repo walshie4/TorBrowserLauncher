@@ -39,4 +39,4 @@ if [ ! -z $localVersion ]; then #checks if the localVersion variable is set
 else
     installTor
 fi
-open TorBrowserBundle_en-US.app
+open "${PATH_TO_TOR}/TorBrowserBundle_en-US.app"
