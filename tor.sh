@@ -17,8 +17,15 @@ upgrade () {
 installTor () {
     cd $PATH_TO_TOR
     curl -o tor $URL
+    confim "$URL.asc"
     unzip tor
     rm tor
+}
+
+confirm () {
+    curl -o hash $1
+    verify=`gpg --verify hash`
+    echo $verify
 }
 
 if [ -f "$PATH_TO_TOR/TorBrowserBundle_en-US.app/Docs/sources/versions" ]; then
