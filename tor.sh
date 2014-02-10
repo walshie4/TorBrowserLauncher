@@ -8,27 +8,29 @@ OS='osx' #Changing this is experimental and has NOT been tested!
 BIT='32' #Changing this is experimental and has NOT been tested!
 baseURL='https://www.torproject.org/dist/torbrowser/' #Do not change this (unless you really want to...It will lower the security of this system)
 
+DEBUG=FALSE
+
 confirm () {
     echo "Confirming build signature"
-    curl -o hash $1
-    verify=`gpg --verify hash`
-    echo $verify
+    curl -o hash $1 > /dev/null
+    verify=`gpg --verify hash` > /dev/null
+    echo $verify #debug print
 }
 
 upgrade () {
     echo "Upgrading TBB..."
     cd $PATH_TO_TOR
-    rm -R TorBrowserBundle_en-US.app
+    rm -R TorBrowserBundle_en-US.app > /dev/null 
     installTor
 }
 
 installTor () {
     echo "Installing new build of TBB.."
     cd $PATH_TO_TOR
-    curl -o tor $URL
+    curl -o tor $URL > /dev/null
     confim "$URL.asc"
-    unzip tor
-    rm tor
+    unzip tor > /dev/null
+    rm tor > /dev/null
 }
 
 if [ -f "$PATH_TO_TOR/TorBrowserBundle_en-US.app/Docs/sources/versions" ]; then
@@ -37,10 +39,10 @@ if [ -f "$PATH_TO_TOR/TorBrowserBundle_en-US.app/Docs/sources/versions" ]; then
 else
     echo "Local install not found"
 fi
-curl -o page $baseURL
+curl -o page $baseURL > /dev/null
 BUILD=`more page | cut -d '<' -f3 | grep href | cut -d '>' -f2 | head -n 1 | cut -f1 -d '/'`
 echo "The current build is $BUILD"
-rm page
+rm page > /dev/null
 URL="${baseURL}${BUILD}/TorBrowserBundle-${BUILD}-${OS}${BIT}_${LANG}.zip"
 #echo $localVersion
 #echo $BUILD
