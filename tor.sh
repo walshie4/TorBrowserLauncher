@@ -12,8 +12,7 @@ DEBUG=FALSE
 
 confirm () {
     echo "Confirming build signature"
-    curl -o hash $1 &> /dev/null
-    verify=`gpg --verify hash` &> /dev/null
+    verify=`gpg --verify "$PATH_TO_TOR/$NAME.zip.asc" "$PATH_TO_TOR/$NAME.zip"` &> /dev/null
     echo $verify #debug print
 }
 
@@ -27,10 +26,12 @@ upgrade () {
 installTor () {
     echo "Installing new build of TBB.."
     cd $PATH_TO_TOR
-    curl -o tor $URL &> /dev/null
-    confim "$URL.asc"
-    unzip tor &> /dev/null
-    rm tor &> /dev/null
+    curl -o "$PATH_TO_TOR/$NAME.zip" $URL &> /dev/null
+    curl -o "$PATH_TO_TOR/$NAME.zip.asc" $URL &> /dev/null
+    confirm
+    unzip "$NAME.zip" &> /dev/null
+    rm "$NAME.zip" &> /dev/null
+    rm "$NAME.zip.asc" &> /dev/null
 }
 
 if [ -f "$PATH_TO_TOR/TorBrowserBundle_en-US.app/Docs/sources/versions" ]; then
@@ -43,7 +44,8 @@ curl -o page $baseURL &> /dev/null
 BUILD=`more page | cut -d '<' -f3 | grep href | cut -d '>' -f2 | head -n 1 | cut -f1 -d '/'`
 echo "The current build is $BUILD"
 rm page &> /dev/null
-URL="${baseURL}${BUILD}/TorBrowserBundle-${BUILD}-${OS}${BIT}_${LANG}.zip"
+NAME="TorBrowserBundle-${BUILD}-${OS}${BIT}_${LANG}"
+URL="${baseURL}${BUILD}/$NAME.zip"
 #echo $localVersion
 #echo $BUILD
 if [ ! -z $localVersion ]; then #checks if the localVersion variable is set
