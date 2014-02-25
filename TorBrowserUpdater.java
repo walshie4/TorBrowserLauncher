@@ -14,8 +14,39 @@
  */
 
 public class TorBrowserUpdater {
+    /**
+     * checkForLocalInstall() -
+     *
+     * Prompt user for path to installed TBB
+     * (if one is installed) and return a
+     * string containing the version number
+     *
+     * @return A string containing the version number of the local TBB
+     */
+    public String checkForLocalInstall() {
 
+    }
+    /**
+     * getVersion()
+     *
+     * Get the most recent version from torproject.org
+     * and return it as a string
+     *
+     * @return A string containing the version number of current TBB release
+     */
+    public String getVersion() {
+
+    }
+    /**
+     * Main method - runs the program
+     *
+     * @param args - Command-line arguments
+     *
+     */
     public static void main(String[] args) {
-        //do stuff
+        System.out.println("Checking for local install");
+        //check for install
+        System.out.println("Checking torproject.org for current version");
+        //get version
     }
 }
