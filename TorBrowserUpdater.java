@@ -15,6 +15,51 @@
 
 public class TorBrowserUpdater {
     /**
+     * launchTBB() - launch Tor Browser Bundle
+     *
+     * @return true if launched successfully, else false
+     */
+    public boolean launchTBB() {
+        //launch
+    }
+    /**
+     * verifySignature() - verify PGP signature
+     *
+     * @param File containing signature data
+     *
+     * @return true if verified, else false
+     */
+    public boolean verifySignature(File signature) {
+        //verify
+    }
+    /**
+     * installNew() - installs new version of TBB
+     *
+     * @return true if install is successful, else false
+     */
+    public boolean installNew() {
+        //install
+    }
+    /**
+     * deleteLocalInstall() - deletes the local TBB install
+     *
+     * @return true if deleted, else false
+     */
+    public boolean deleteLocalInstall() {
+        //delete
+    }
+    /**
+     * outOfDate() - check if local install is old
+     *
+     * @param local String containing local version number
+     * @param current String containing current version number
+     *
+     * @return true when out-of-date, false when install is current
+     */
+    public boolean outOfDate(String local, String current) {
+        //compare
+    }
+    /**
      * checkForLocalInstall() -
      *
      * Prompt user for path to installed TBB
@@ -22,6 +67,7 @@ public class TorBrowserUpdater {
      * string containing the version number
      *
      * @return A string containing the version number of the local TBB
+     *          or "" if no install is found
      */
     public String checkForLocalInstall() {
 
@@ -48,5 +94,13 @@ public class TorBrowserUpdater {
         //check for install
         System.out.println("Checking torproject.org for current version");
         //get version
+        if(outOfDate(local, current)) {
+            //update and delete old version
+        }
+        else {
+            //local is up-to-date
+        }
+        System.out.println("Launching TorBrowserBundle");
+        //launch TBB
     }
 }
