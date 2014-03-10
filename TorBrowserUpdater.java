@@ -6,7 +6,9 @@
  * and if there is one it will download it, delete the old
  * one and verify the signature of the new release.
  */
-
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 /**
  * Written by: Adam Walsh
  * Written on: 2/25/14
@@ -14,12 +16,25 @@
  */
 
 public class TorBrowserUpdater {
+    private File TBB; /**Stores the location of local TBB install*/
+    private final String urlBase; /**Base of url to download new TBB releases*/
+    private String version; /**String representation of current installed version*/
+    private String current; /**String representation of most current release
+                               available*/
+    /**
+     * constructor - Creates a new TorBrowserUpdater object
+     *
+     * @return new TorBrowserUpdater object
+     */
+    public TorBrowserUpdater() {
+        this.urlBase = "https://www.torproject.org/dist/torbrowser/";
+    }
     /**
      * launchTBB() - launch Tor Browser Bundle
      *
      * @return true if launched successfully, else false
      */
-    public boolean launchTBB() {
+    private boolean launchTBB() {
         //launch
     }
     /**
@@ -29,7 +44,7 @@ public class TorBrowserUpdater {
      *
      * @return true if verified, else false
      */
-    public boolean verifySignature(File signature) {
+    private boolean verifySignature(File signature) {
         //verify
     }
     /**
@@ -37,7 +52,7 @@ public class TorBrowserUpdater {
      *
      * @return true if install is successful, else false
      */
-    public boolean installNew() {
+    private boolean installNew() {
         //install
     }
     /**
@@ -45,7 +60,7 @@ public class TorBrowserUpdater {
      *
      * @return true if deleted, else false
      */
-    public boolean deleteLocalInstall() {
+    private boolean deleteLocalInstall() {
         //delete
     }
     /**
@@ -56,7 +71,7 @@ public class TorBrowserUpdater {
      *
      * @return true when out-of-date, false when install is current
      */
-    public boolean outOfDate(String local, String current) {
+    private boolean outOfDate(String local, String current) {
         //compare
     }
     /**
@@ -69,7 +84,7 @@ public class TorBrowserUpdater {
      * @return A string containing the version number of the local TBB
      *          or "" if no install is found
      */
-    public String checkForLocalInstall() {
+    private String checkForLocalInstall() {
 
     }
     /**
@@ -80,7 +95,7 @@ public class TorBrowserUpdater {
      *
      * @return A string containing the version number of current TBB release
      */
-    public String getVersion() {
+    private String getVersion() {
 
     }
     /**
@@ -90,17 +105,6 @@ public class TorBrowserUpdater {
      *
      */
     public static void main(String[] args) {
-        System.out.println("Checking for local install");
-        //check for install
-        System.out.println("Checking torproject.org for current version");
-        //get version
-        if(outOfDate(local, current)) {
-            //update and delete old version
-        }
-        else {
-            //local is up-to-date
-        }
-        System.out.println("Launching TorBrowserBundle");
-        //launch TBB
+        //run program
     }
 }
