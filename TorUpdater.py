@@ -2,6 +2,10 @@
 #Written by: Adam Walsh
 #Written on 4/2/14
 
+from BeautifulSoup import BeautifulSoup
+import sys
+import os
+
 class TBBUpdater:
     def __init__:
         self.currentVersion = getCurrentVersion()
