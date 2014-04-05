@@ -15,9 +15,12 @@ class TBBUpdater:
     lang = None
 
     def detectLocalInstall(self):
-        print("Detecting local install...")
-#look in default location to find install, if not found ask user if a custom
-#location install exists
+        localPath = raw_input("Please enter the path to the local TBB install\n"
+                       + "or just press enter if no local install exists")
+        if localPath == '':
+            return None
+        else:
+            return localPath
 
     def getInstalledVersion(self, path):
         if path == None:
