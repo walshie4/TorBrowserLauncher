@@ -6,10 +6,12 @@ from BeautifulSoup import BeautifulSoup
 import requests
 import sys
 import os
+import platform
 
 class TBBUpdater:
     currentVersion = None
     installedVersion = None
+    lang = None
 
     def detectLocalInstall(self):
         print("Detecting local install...")
@@ -55,6 +57,31 @@ class TBBUpdater:
         else:
             return False
 
+    def getLanguage(self):
+        supported = {'Arabic' : 'ar',
+                     'German' : 'de',
+               'English (US)' : 'en-US',
+        'Spanish (Castilian)' : 'es-ES',
+                    'Farsi'   : 'fa',
+                    'French'  : 'fr',
+                    'Italian' : 'it',
+                    'Korean'  : 'ko',
+                    'Dutch'   : 'nl',
+                    'Polish'  : 'pl',
+      'Portuguese (Portugal)' : 'pt-Pt',
+                   'Russian'  : 'ru',
+                 'Vietnamese' : 'vi',
+                'Chinese (S)' : 'zh-CN'}
+        index = 0
+        for lang in supported:
+            print str(index) + ' ~ ' + lang
+            index += 1
+        selected = int(raw_input("Please select which language pack you "
+            + "would like to use: "))
+        keys = supported.keys()
+        self.lang = supported[keys[selected]]
+        print self.lang
+
 if __name__=="__main__":
     updater = TBBUpdater()
     updater.getCurrentVersion()
@@ -64,3 +91,4 @@ if __name__=="__main__":
     #else:
         #updater.update()
     #updater.launchTBB()
+    updater.getLanguage()
