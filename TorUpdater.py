@@ -82,9 +82,27 @@ class TBBUpdater:
         self.lang = supported[keys[selected]]
         print self.lang
 
+    def getOS(self):
+        name = platform.system().lower()
+        if name == 'windows':
+            return 'win'
+        elif name == 'darwin':
+            return 'mac'
+        elif name.lower().find('linux') > -1:
+            return 'linux'
+        else:
+            return None
+
+    def getArch(self):#A bug exists that affects this (http://bugs.python.org/issue7860)
+        archs = {'AMD64' : 64, 'x86_64': 64, 'i386': 32, 'x86': 32}
+        machine = platform.machine()
+        return archs.get(machine, None)
+
 if __name__=="__main__":
     updater = TBBUpdater()
     updater.getCurrentVersion()
+    print updater.getOS()
+    print updater.getArch()
     if updater.upToDate():
         print("Installed version is up-to-date")
         #no need to update, launch bundle
