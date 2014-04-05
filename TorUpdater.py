@@ -7,6 +7,7 @@ import requests
 import sys
 import os
 import platform
+import gnupg
 
 class TBBUpdater:
     currentVersion = None
@@ -18,19 +19,19 @@ class TBBUpdater:
 #look in default location to find install, if not found ask user if a custom
 #location install exists
 
-    def getInstalledVersion(self, path):    #The looking for an installed version may
-        if path == None:                    #be thrown out for additional security to
-            print ("No local install found.")#prevent accidental use of a tampered
-        print("Gathering version info for local install")#version of TBB on your local
-                                                         #machine
+    def getInstalledVersion(self, path):
+        if path == None:
+            print ("No local install found.")
+            return None
+        print("Gathering version info for local install")
 
     def getCurrentVersion(self):
         res = requests.get("https://www.torproject.org/dist/torbrowser/")
         soup = BeautifulSoup(res.text)
         versions = list()
         versionsNext = False
-        for link in soup.findAll('a'):
-            name = link.get('href')
+        for link in soup.findAll('a'): #finda all links
+            name = link.get('href') #get href contents
             if versionsNext:
                 versions.append(name)
             elif name == '/dist/':
@@ -98,11 +99,21 @@ class TBBUpdater:
         machine = platform.machine()
         return archs.get(machine, None)
 
+    def getDLURL(self, os, arch, version):
+        #generates and returns the DL url for the specified params
+
+    def generateHash(self, filepath): #generate a sha-256 hash for the file at param filepath
+        sha256 = hashlib.sha256()
+        f = open(filepath, 'rb')
+        try:
+            sha256.update(f.read())
+        finally:
+            f.close()
+        return sha256.hexdigest()
+
 if __name__=="__main__":
     updater = TBBUpdater()
     updater.getCurrentVersion()
-    print updater.getOS()
-    print updater.getArch()
     if updater.upToDate():
         print("Installed version is up-to-date")
         #no need to update, launch bundle
