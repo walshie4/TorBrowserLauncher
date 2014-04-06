@@ -10,11 +10,7 @@ import platform
 import gnupg
 
 class TBBUpdater:
-    currentVersion = None
-    installedVersion = None
-    lang = None
-
-    def detectLocalInstall(self):
+    def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
                        + "or just press enter if no local install exists")
         if localPath == '':
@@ -48,7 +44,7 @@ class TBBUpdater:
                                                             #the newest available
         selection = int(raw_input("Please select which build you would like to run: "))
         print("Selected version: " + versions[selection])
-        self.currentVersion = versions[selection]
+        return versions[selection][:-1] #chop last char (it's a /)
 
     def upToDate(self):
         if self.currentVersion == None or self.installedVersion == None:
@@ -61,7 +57,7 @@ class TBBUpdater:
         else:
             return False
 
-    def getLanguage(self):
+    def getLang(self):
         supported = {'Arabic' : 'ar',
                      'German' : 'de',
                'English (US)' : 'en-US',
@@ -83,8 +79,7 @@ class TBBUpdater:
         selected = int(raw_input("Please select which language pack you "
             + "would like to use: "))
         keys = supported.keys()
-        self.lang = supported[keys[selected]]
-        print self.lang
+        return supported[keys[selected]]
 
     def getOS(self):
         name = platform.system().lower()
@@ -102,8 +97,39 @@ class TBBUpdater:
         machine = platform.machine()
         return archs.get(machine, None)
 
-    def getDLURL(self, os, arch, version):
-        #generates and returns the DL url for the specified params
+    def getDLURL(self, os, arch, version, lang):
+        url = "https://www.torproject.org/dist/torbrowser/"
+        url += version + "/"
+        if os == 'win': #build windows DL URL
+            url += 'torbrowser-install-'
+            suffix = '.exe'
+            url += version + '_'
+            url += lang
+            url += suffix
+            return url
+        elif os == 'mac': #build mac DL URL
+            url += 'TorBrowserBundle-'
+            suffix = '.zip'
+            url += version + '-osx32_'
+            url += lang
+            url += suffix
+            return url
+        elif os == 'linux': #build linux DL URL
+            url += 'tor-browser-'
+            suffix = '.tar.xz'
+            if arch == 32:
+                url += 'linux32-'
+            elif arch == 64:
+                url += 'linux64-'
+            else:
+                print ("Unsupported architecture detected...using 32-bit")
+                url += 'linux32-'
+            url += version + '_'
+            url += lang
+            url += suffix
+            return url
+        else:
+            raise ValueError("Unsupported OS detected")
 
     def generateHash(self, filepath): #generate a sha-256 hash for the file at param filepath
         sha256 = hashlib.sha256()
@@ -116,7 +142,11 @@ class TBBUpdater:
 
 if __name__=="__main__":
     updater = TBBUpdater()
-    updater.getCurrentVersion()
+    os = updater.getOS()
+    arch = updater.getArch()
+    current = updater.getCurrentVersion()
+    lang = updater.getLang()
+    currentURL = updater.getDLURL(os, arch, current, lang)
     if updater.upToDate():
         print("Installed version is up-to-date")
         #no need to update, launch bundle
