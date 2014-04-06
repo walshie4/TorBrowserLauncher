@@ -18,11 +18,20 @@ class TBBUpdater:
         else:
             return localPath
 
-    def getInstalledVersion(self, path):
+    def getInstalledVersion(self, path, os):
         if path == None:
-            print ("No local install found.")
+            print "No local install found."
             return None
-        print("Gathering version info for local install")
+        print "Gathering version info for local install"
+        if os == 'win':
+            #find version info
+        elif os == 'mac':
+            #find version info
+        elif os == 'linux':
+            #find version info
+        else:
+            print "Local install could not be detected because of an\n"
+                + "unsupported OS."
 
     def getCurrentVersion(self):
         res = requests.get("https://www.torproject.org/dist/torbrowser/")
