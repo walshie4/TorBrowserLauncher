@@ -8,6 +8,7 @@ import sys
 import os
 import platform
 import gnupg
+import urllib
 
 class TBBUpdater:
     def getLocalInstall(self):
@@ -38,7 +39,7 @@ class TBBUpdater:
         soup = BeautifulSoup(res.text)
         versions = list()
         versionsNext = False
-        for link in soup.findAll('a'): #finda all links
+        for link in soup.findAll('a'): #find all links
             name = link.get('href') #get href contents
             if versionsNext:
                 versions.append(name)
@@ -148,6 +149,12 @@ class TBBUpdater:
         finally:
             f.close()
         return sha256.hexdigest()
+
+    def downloadFileAt(url):
+        pieces = url.split('/')
+        name = pieces[len(pieces)-1] #get filename from url
+        urllib.retrieve(url, name)
+        return open(name).name #return filepath
 
 if __name__=="__main__":
     updater = TBBUpdater()
