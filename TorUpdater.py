@@ -5,7 +5,7 @@
 from BeautifulSoup import BeautifulSoup
 import requests
 import sys
-import os
+import os as OS
 import platform
 import gnupg
 import urllib
@@ -50,7 +50,8 @@ class TBBUpdater:
                 + "comparison of your installed version to the current version\n"
                 + "you've selected cannot be done. Please install using the .exe\n"
                 + "(don't worry the signature has been verified) and then enter the\n"
-                + "path to that install here: ")
+                + "path to that install here:")
+            path = raw_input("-> ")
         elif os == 'mac':
             print "Unzipping selected verison of the TBB"
         elif os == 'linux':
@@ -145,16 +146,26 @@ class TBBUpdater:
         return sha256.hexdigest()
 
     def downloadFileAt(self, url):
-        print "Downloading..."
         pieces = url.split('/')
         name = pieces[len(pieces)-1] #get filename from url
+        print "Downloading " + name + " ..."
         urllib.urlretrieve(url, name)
         print "Download complete."
         return open(name).name #return filepath
 
-    def verifySignature(self, sig):
-        gpg = gnupg.GPG() #use default home dir
+    def verifySignature(self, sig, currentTBB): #sig should be filepath to sig file (.asc)
+        gnupgHome = OS.getcwd()+'/.gnupg'
+        print gnupgHome
+        gpg = gnupg.GPG(gnupghome=gnupgHome) #if you get permission denied move file and run again
         gpg.encoding = 'utf-8'
+        sigStream = open(sig, 'rb')
+        print("Verifying signature...")
+        verified = gpg.verify(sigStream, currentTBB) #verify signature file
+        if not verified:
+            raise ValueError("Signature could not be verified!") #raise some hell
+        else:
+            print "Signature verified!"
+            return True
 
 if __name__=="__main__":
     updater = TBBUpdater()
@@ -164,8 +175,10 @@ if __name__=="__main__":
     lang = updater.getLang()
     currentURL = updater.getDLURL(os, arch, current, lang)
     currentTBB = updater.downloadFileAt(currentURL)
+    sig = updater.downloadFileAt(currentURL + '.asc')
+    updater.verifySignature(sig, currentTBB)
     localPath = updater.getLocalInstall()
-    if updater.upToDate():
+    if updater.upToDate(localPath, currentTBB, os):
         print("Installed version is up-to-date")
         #no need to update, launch bundle
     #else:
