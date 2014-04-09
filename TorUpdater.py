@@ -13,26 +13,12 @@ import urllib
 class TBBUpdater:
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
-                       + "or just press enter if no local install exists")
+                       + "a simple way to do this is to drag the file onto this terminal\n"
+                       + "or just press enter if no local install exists.\n")
         if localPath == '':
             return None
         else:
             return localPath
-
-    def getInstalledVersion(self, path, os):
-        if path == None:
-            print "No local install found."
-            return None
-        print "Gathering version info for local install"
-        if os == 'win':
-            #find version info
-        elif os == 'mac':
-            #find version info
-        elif os == 'linux':
-            #find version info
-        else:
-            print "Local install could not be detected because of an\n"
-                + "unsupported OS."
 
     def getCurrentVersion(self):
         res = requests.get("https://www.torproject.org/dist/torbrowser/")
@@ -56,16 +42,24 @@ class TBBUpdater:
         print("Selected version: " + versions[selection])
         return versions[selection][:-1] #chop last char (it's a /)
 
-    def upToDate(self):
-        if self.currentVersion == None or self.installedVersion == None:
-            print("Either current version or installed version variable is null.\n"
-                    + "This means either a local install has not been found or\n"
-                    + "checks are being made before getting both the current and\n"
-                    + "installed version numbers of the TBB.")
-        elif self.currentVersion == self.installedVersion:
-            return True
+    def upToDate(self, local, current, os): #local should be the path to local install or None
+        if local == None:               #if no local install exists. current should be the
+            return False                #path to the current version download
+        if os == 'win':
+            print("Because of Windows using an .exe installer the automated\n"
+                + "comparison of your installed version to the current version\n"
+                + "you've selected cannot be done. Please install using the .exe\n"
+                + "(don't worry the signature has been verified) and then enter the\n"
+                + "path to that install here: ")
+        elif os == 'mac':
+            print "Unzipping selected verison of the TBB"
+        elif os == 'linux':
+            print "Unarchiving selected version of the TBB"
         else:
-            return False
+            print("Because your OS is not currently supported, the automated\n"
+                + "comparison of your installed version to the current version\n"
+                + "you've selected cannot be done. Please report this issue on\n"
+                + "the Github project page. Sorry!")
 
     def getLang(self):
         supported = {'Arabic' : 'ar',
@@ -150,11 +144,17 @@ class TBBUpdater:
             f.close()
         return sha256.hexdigest()
 
-    def downloadFileAt(url):
+    def downloadFileAt(self, url):
+        print "Downloading..."
         pieces = url.split('/')
         name = pieces[len(pieces)-1] #get filename from url
-        urllib.retrieve(url, name)
+        urllib.urlretrieve(url, name)
+        print "Download complete."
         return open(name).name #return filepath
+
+    def verifySignature(self, sig):
+        gpg = gnupg.GPG() #use default home dir
+        gpg.encoding = 'utf-8'
 
 if __name__=="__main__":
     updater = TBBUpdater()
@@ -163,6 +163,8 @@ if __name__=="__main__":
     current = updater.getCurrentVersion()
     lang = updater.getLang()
     currentURL = updater.getDLURL(os, arch, current, lang)
+    currentTBB = updater.downloadFileAt(currentURL)
+    localPath = updater.getLocalInstall()
     if updater.upToDate():
         print("Installed version is up-to-date")
         #no need to update, launch bundle
