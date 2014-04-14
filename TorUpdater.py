@@ -11,8 +11,31 @@ import urllib
 from subprocess import Popen, PIPE
 
 class TBBUpdater:
+<<<<<<< HEAD
     FINGERPRINT = "8738 A680 B84B 3031 A630  F2DB 416F 0610 63FE E659"
     LINUX_FINGERPRINT = "261C 5FBE 7728 5F88 FB0C  3432 66C8 C2D7 C5AA 446D"
+=======
+    def run(self): #run updater
+                                #Order of operations:   (implemented?)
+                                #get sys info (os, arch)
+                                #get desired build
+                                #get desired lang
+                                #download build and sig
+                                #verify signature
+                                #install/unarchive new build
+                                #delete install file/archive file
+                                #get local install path
+                                #compare DL'd build and local build via SHA-256 hash
+                                #if not the same:
+                                    #delete local build
+                                    #move new build to location of local build
+                                #if the same:
+                                    #delete new install
+                                #launch newest build
+                                #exit
+        print "Running..."
+
+>>>>>>> ff4bbf3d39470057848c8339355e4e08ffebb4ea
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
                        + "a simple way to do this is to drag the file onto this terminal\n"
