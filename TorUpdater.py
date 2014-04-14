@@ -12,6 +12,7 @@ from subprocess import Popen, PIPE
 
 class TBBUpdater:
     FINGERPRINT = "8738 A680 B84B 3031 A630  F2DB 416F 0610 63FE E659"
+    LINUX_FINGERPRINT = "261C 5FBE 7728 5F88 FB0C  3432 66C8 C2D7 C5AA 446D"
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
                        + "a simple way to do this is to drag the file onto this terminal\n"
@@ -161,26 +162,22 @@ class TBBUpdater:
         getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x416F061063FEE659"
         (stdout, stderr) = Popen(getKeyCmd, stdout=PIPE, shell=True).communicate()
         print stdout
+        if os == 'linux':
+            print("Fetching TBB's secondary linux key...")
+            getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x140C961B"
+            (stdout, stderr) = Popen(getKeyCmd, stdout=PIPE, shell=True).communicate()
+            print stdout
+            if not stdout.find(self.LINUX_FINGERPRINT):#linux key is not valid
+                raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying the key needed to verify the signature")
         verifyKeyCmd = "gpg --fingerprint 0x416F061063FEE659"
         (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
-        if not self.verifyKeySig(stdout, os):#key is not valid
-        #    if not os == 'linux':
+        if not stdout.find(self.FINGERPRINT):#key is not valid (for non-linux)
             raise ValueError("The key you have does not match the known fingerprint!")
-        #    else: #try linux's secondary key
-        #        print("Fetching linux's secondary key")
-        #        getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x140C961B"
-        #        (stdout, stderr)
         print("Verifying signature file...")
         verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
         (stdout, stderr) = Popen(verifySigCmd, stdout=PIPE, shell=True).communicate()
         print stdout
-
-    def verifyKeySig(self, keySig, os):
-        if keySig.find(self.FINGERPRINT):
-            return True
-        else:
-            return False
 
 if __name__=="__main__":
     updater = TBBUpdater()
