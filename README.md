@@ -1,4 +1,4 @@
-<b>TorBrowserUpdater</b>
+#TorBrowserUpdater
 
 ###Important
 I am in no way affiliated with the TorProject (although I do admire their work), and this script
