@@ -11,10 +11,26 @@ import urllib
 from subprocess import Popen, PIPE
 
 class TBBUpdater:
-<<<<<<< HEAD
-    FINGERPRINT = "8738 A680 B84B 3031 A630  F2DB 416F 0610 63FE E659"
-    LINUX_FINGERPRINT = "261C 5FBE 7728 5F88 FB0C  3432 66C8 C2D7 C5AA 446D"
-=======
+#The following output variables hold the expected output of running the command
+# gpg --fingerprint KEY
+#Where KEY is either 0x416F061063FEE659 (for the key most used to sign the TBB)
+#or 0x140C961B (for the key sometimes used to sign the linux TBB)
+    OUTPUT = """pub   2048R/63FEE659 2003-10-16
+      Key fingerprint = 8738 A680 B84B 3031 A630  F2DB 416F 0610 63FE E659
+uid                  Erinn Clark <erinn@torproject.org>
+uid                  Erinn Clark <erinn@debian.org>
+uid                  Erinn Clark <erinn@double-helix.org>
+sub   2048R/EB399FD7 2003-10-16
+
+"""
+    LINUX_OUTPUT = """pub   4096R/C5AA446D 2010-07-14
+      Key fingerprint = 261C 5FBE 7728 5F88 FB0C  3432 66C8 C2D7 C5AA 446D
+uid                  Sebastian Hahn <sebastian@torproject.org>
+uid                  Sebastian Hahn <mail@sebastianhahn.net>
+sub   2048R/A2499719 2010-07-14
+sub   2048R/140C961B 2010-07-14
+
+"""
     def run(self): #run updater
                                 #Order of operations:   (implemented?)
                                 #get sys info (os, arch)
@@ -34,12 +50,28 @@ class TBBUpdater:
                                 #launch newest build
                                 #exit
         print "Running..."
+        os = updater.getOS()
+        arch = updater.getArch()
+        current = updater.getCurrentVersion()
+        lang = updater.getLang()
+        currentURL = updater.getDLURL(os, arch, current, lang)
+        currentTBB = updater.downloadFileAt(currentURL)
+        sig = updater.downloadFileAt(currentURL + '.asc')
+        if not updater.verifySignature(currentTBB, os):#if verification fails
+            print("Exiting...")
+            sys.exit()
+        localPath = updater.getLocalInstall()
+        if updater.upToDate(localPath, currentTBB, os):
+            print("Installed version is up-to-date")
+            #no need to update, launch bundle
+        #else:
+            #updater.update()
+        #updater.launchTBB()
 
->>>>>>> ff4bbf3d39470057848c8339355e4e08ffebb4ea
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
                        + "a simple way to do this is to drag the file onto this terminal\n"
-                       + "or just press enter if no local install exists.\n")
+                       + "or just press enter if no local install exists.\n-> ")
         if localPath == '':
             return None
         else:
@@ -75,7 +107,7 @@ class TBBUpdater:
                 + "comparison of your installed version to the current version\n"
                 + "you've selected cannot be done. Please install using the .exe\n"
                 + "(don't worry the signature has been verified) and then enter the\n"
-                + "path to that install here:")
+                + "path to that install here: (hint: use the desktop, then drag n drop here)")
             path = raw_input("-> ")
         elif os == 'mac':
             print "Unzipping selected verison of the TBB"
@@ -86,6 +118,7 @@ class TBBUpdater:
                 + "comparison of your installed version to the current version\n"
                 + "you've selected cannot be done. Please report this issue on\n"
                 + "the Github project page. Sorry!")
+            sys.exit()
 
     def getLang(self):
         supported = {'Arabic' : 'ar',
@@ -179,7 +212,6 @@ class TBBUpdater:
         return open(name).name #return filepath
 
     def verifySignature(self, currentTBB, os): #sig should be filepath to sig file (.asc)
-        sigStream = open(sig, "rb")
         print("Verifying signature...")
         print("Fetching TBB signer's key...")
         getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x416F061063FEE659"
@@ -190,33 +222,24 @@ class TBBUpdater:
             getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x140C961B"
             (stdout, stderr) = Popen(getKeyCmd, stdout=PIPE, shell=True).communicate()
             print stdout
-            if not stdout.find(self.LINUX_FINGERPRINT):#linux key is not valid
+            if not stdout == self.LINUX_OUPUT:#linux key is not valid
                 raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying the key needed to verify the signature")
         verifyKeyCmd = "gpg --fingerprint 0x416F061063FEE659"
         (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
-        if not stdout.find(self.FINGERPRINT):#key is not valid (for non-linux)
+        if not stdout == self.OUTPUT:#key is not valid (for non-linux)
             raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying signature file...")
         verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
         (stdout, stderr) = Popen(verifySigCmd, stdout=PIPE, shell=True).communicate()
         print stdout
+        if stdout.find("Good signature"):
+            print("Signature verified.")
+            return True
+        else:
+            print("Signature was not verified!")
+            return False
 
 if __name__=="__main__":
     updater = TBBUpdater()
-    os = updater.getOS()
-    arch = updater.getArch()
-    current = updater.getCurrentVersion()
-    lang = updater.getLang()
-    currentURL = updater.getDLURL(os, arch, current, lang)
-    currentTBB = updater.downloadFileAt(currentURL)
-    sig = updater.downloadFileAt(currentURL + '.asc')
-    updater.verifySignature(currentTBB, os)
-    localPath = updater.getLocalInstall()
-    if updater.upToDate(localPath, currentTBB, os):
-        print("Installed version is up-to-date")
-        #no need to update, launch bundle
-    #else:
-        #updater.update()
-    #updater.launchTBB()
-    updater.getLanguage()
+    updater.run()
