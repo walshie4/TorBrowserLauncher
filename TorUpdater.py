@@ -74,7 +74,7 @@ sub   2048R/140C961B 2010-07-14
             return raw_input("-> ").rstrip()
         elif os == 'mac':#Mac
             print("Extracting the .app from the downloaded (and verified) .zip file")
-            call("unzip " + currentTBB, shell=True)#extract using the shell
+            call("unzip " + currentTBB + " > /dev/null", shell=True)#extract using the shell
             return OS.getcwd() + "/TorBrowserBundle_" + lang + ".app"
         elif os == 'linux':#linux
             print("Extracting app from the downloaded (and verified) archive")
