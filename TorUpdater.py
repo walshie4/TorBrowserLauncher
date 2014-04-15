@@ -9,7 +9,6 @@ import os as OS
 import platform
 import urllib
 from subprocess import Popen, PIPE, call
-import hashlib
 
 class TBBUpdater:
 #The following output variables hold the expected output of running the command
@@ -42,13 +41,9 @@ sub   2048R/140C961B 2010-07-14
                                 #install/unarchive new build
                                 #delete install file/archive file
                                 #get local install path
-                                #compare DL'd build and local build via SHA-256 hash
-                                #if not the same:
-                                    #delete local build
-                                    #move new build to location of local build
-                                #if the same:
-                                    #delete new install
-                                #launch newest build
+                                #move new build to location of local build
+                                #delete extra files
+                                #launch new build
                                 #exit
         print "Running..."
         os = updater.getOS()
@@ -62,13 +57,9 @@ sub   2048R/140C961B 2010-07-14
             print("Exiting...")
             sys.exit()
         localPath = updater.getLocalInstall()
-        if updater.upToDate(localPath, currentTBB, os, lang):
-            print("Installed version is up-to-date")
-            #no need to update, launch bundle
-        else:
-            print("Installed version is outdated, deleting and updating...")
-            #updater.update()
+        updater.update(localPath, currentTBB)
         print("Cleaning up extra files...")
+        updater.cleanUp(sig, currentTBB)
         print("Launching TBB...")
         updater.launchTBB()
         print("Exiting...")
@@ -103,30 +94,6 @@ sub   2048R/140C961B 2010-07-14
         selection = int(raw_input("Please select which build you would like to run: "))
         print("Selected version: " + versions[selection])
         return versions[selection][:-1] #chop last char (it's a /)
-
-    def upToDate(self, local, current, os, lang): #local should be the path to local install or None
-        if local == None:               #if no local install exists. current should be the
-            return False                #path to the current version download
-        if os == 'win':
-            print("Because of Windows using an .exe installer the automated\n"
-                + "comparison of your installed version to the current version\n"
-                + "you've selected cannot be done. Please install using the .exe\n"
-                + "(don't worry the signature has been verified) and then enter the\n"
-                + "path to that install here: (hint: use the desktop, then drag n drop here)")
-            path = raw_input("-> ")
-            return self.generateHash(path) == self.generateHash(local)
-        elif os == 'mac':
-            print "Unzipping selected verison of the TBB"
-            call("unzip " + current, shell=True)#extract to current dir
-            return self.generateHash("TorBrowserBundle_"+ lang +".app") == self.generateHash(local)
-        elif os == 'linux':
-            print "Unarchiving selected version of the TBB"
-        else:
-            print("Because your OS is not currently supported, the automated\n"
-                + "comparison of your installed version to the current version\n"
-                + "you've selected cannot be done. Please report this issue on\n"
-                + "the Github project page. Sorry!")
-            sys.exit()
 
     def getLang(self):
         supported = {'Arabic' : 'ar',
@@ -201,15 +168,6 @@ sub   2048R/140C961B 2010-07-14
             return url
         else:
             raise ValueError("Unsupported OS detected")
-
-    def generateHash(self, filepath): #generate a sha-256 hash for the file at param filepath
-        sha256 = hashlib.sha256()
-        f = open(filepath, 'rb')
-        try:
-            sha256.update(f.read())
-        finally:
-            f.close()
-        return sha256.hexdigest()
 
     def downloadFileAt(self, url):
         pieces = url.split('/')
