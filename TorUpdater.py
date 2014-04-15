@@ -58,19 +58,36 @@ sub   2048R/140C961B 2010-07-14
         if not self.verifySignature(currentTBB, os):#if verification fails
             print("Exiting...")
             sys.exit()
-        newPath = self.install(currentTBB, os)
+        newPath = self.install(currentTBB, os, lang)
         localPath = self.getLocalInstall()
-        self.update(localPath, currentTBB)
-        print("Cleaning up extra files...")
+        self.update(localPath, newPath)
         self.cleanUp(sig, currentTBB)
-        print("Launching TBB...")
-        self.launchTBB(localPath)
+        self.launchTBB(localPath, os)
         print("Exiting...")
+
+    def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
+        if os == 'win':#Windows...
+            print("Because Windows uses an .exe install automated install cannot \n"
+                + "be done. Please run the .exe (don't worry the signature has been \n"
+                + "verified) and then enter the path to that install here.\n"
+                + "Hint: install it to the desktop and then drag n drop here")
+            return raw_input("-> ").rstrip()
+        elif os == 'mac':#Mac
+            print("Extracting the .app from the downloaded (and verified) .zip file")
+            call("unzip " + currentTBB, shell=True)#extract using the shell
+            return OS.getcwd() + "/TorBrowserBundle_" + lang + ".app"
+        elif os == 'linux':#linux
+            print("Extracting app from the downloaded (and verified) archive")
+            #TODO
+        else:
+            print("Your OS is not currently supported. Please report this issue, and\n"
+                + "it will be fixed shortly")
+            sys.exit()
 
     def update(self, local, current):
         if local == None: #no local install
             location = raw_input("Where would you like your TBB install located?\n"
-                    + "Simpliest method for this is drag n drop a folder\n-> ")
+                    + "Simpliest method for this is drag n drop a folder\n-> ").rstrip()
             print("Moving current version to \"" + location + "\"")
             move(current, location)
         else:
