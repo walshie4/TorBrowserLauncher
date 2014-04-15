@@ -46,23 +46,29 @@ sub   2048R/140C961B 2010-07-14
                                 #launch new build
                                 #exit
         print "Running..."
-        os = updater.getOS()
-        arch = updater.getArch()
-        current = updater.getCurrentVersion()
-        lang = updater.getLang()
-        currentURL = updater.getDLURL(os, arch, current, lang)
-        currentTBB = updater.downloadFileAt(currentURL)
-        sig = updater.downloadFileAt(currentURL + '.asc')
-        if not updater.verifySignature(currentTBB, os):#if verification fails
+        os = self.getOS()
+        arch = self.getArch()
+        current = self.getCurrentVersion()
+        lang = self.getLang()
+        currentURL = self.getDLURL(os, arch, current, lang)
+        currentTBB = self.downloadFileAt(currentURL)
+        sig = self.downloadFileAt(currentURL + '.asc')
+        if not self.verifySignature(currentTBB, os):#if verification fails
             print("Exiting...")
             sys.exit()
-        localPath = updater.getLocalInstall()
-        updater.update(localPath, currentTBB)
+        localPath = self.getLocalInstall()
+        self.update(localPath, currentTBB)
         print("Cleaning up extra files...")
-        updater.cleanUp(sig, currentTBB)
+        self.cleanUp(sig, currentTBB)
         print("Launching TBB...")
-        updater.launchTBB()
+        self.launchTBB(localPath)
         print("Exiting...")
+
+    def update(self, local, current):
+        #replace local with current and delete local
+
+    def launchTBB(self, local, os):
+        #launch TBB @ path `local`
 
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
