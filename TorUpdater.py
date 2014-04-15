@@ -102,7 +102,8 @@ sub   2048R/140C961B 2010-07-14
 
     def cleanUp(self, sig, currentTBB):
         print("Deleting extra files no longer needed (downloaded installers, sig, etc.)")
-        #delete files used in the install process (archive downloaded, installer, etc.)
+        OS.remove(currentTBB)
+        OS.remove(sig)
 
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
