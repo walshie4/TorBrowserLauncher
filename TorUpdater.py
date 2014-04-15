@@ -9,6 +9,8 @@ import os as OS
 import platform
 import urllib
 from subprocess import Popen, PIPE, call
+from shutil import move
+from shutil import rmtree as remove
 
 class TBBUpdater:
 #The following output variables hold the expected output of running the command
@@ -56,6 +58,7 @@ sub   2048R/140C961B 2010-07-14
         if not self.verifySignature(currentTBB, os):#if verification fails
             print("Exiting...")
             sys.exit()
+        newPath = self.install(currentTBB, os)
         localPath = self.getLocalInstall()
         self.update(localPath, currentTBB)
         print("Cleaning up extra files...")
@@ -65,12 +68,23 @@ sub   2048R/140C961B 2010-07-14
         print("Exiting...")
 
     def update(self, local, current):
-        #replace local with current and delete local
+        if local == None: #no local install
+            location = raw_input("Where would you like your TBB install located?\n"
+                    + "Simpliest method for this is drag n drop a folder\n-> ")
+            print("Moving current version to \"" + location + "\"")
+            move(current, location)
+        else:
+            print("Deleting local install found @ \"" + local + "\"")
+            remove(local)
+            print("Moving current version to same location as local install was located")
+            move(current, local)#move current to location of where local was
 
     def launchTBB(self, local, os):
+        print("Launching TBB...")
         #launch TBB @ path `local`
 
     def cleanUp(self, sig, currentTBB):
+        print("Deleting extra files no longer needed (downloaded installers, sig, etc.)")
         #delete files used in the install process (archive downloaded, installer, etc.)
 
     def getLocalInstall(self):
@@ -80,7 +94,7 @@ sub   2048R/140C961B 2010-07-14
         if localPath == '':
             return None
         else:
-            return localPath
+            return localPath.rstrip()#get rid of ending whitespace
 
     def getCurrentVersion(self):
         res = requests.get("https://www.torproject.org/dist/torbrowser/")
