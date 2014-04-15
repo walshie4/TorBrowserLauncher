@@ -98,7 +98,18 @@ sub   2048R/140C961B 2010-07-14
 
     def launchTBB(self, local, os):
         print("Launching TBB...")
-        #launch TBB @ path `local`
+        if os == 'win':
+            call(local)#just call the path to the executable (NOT TESTED)
+        elif os == 'mac':
+            call("open " + local, shell=True)#this hack should run the TBB .app
+#although this also creates a security voulnerability using user input data in a shell command.
+#Inital testing makes me believe it is safe (It would be appreciated if someone further check
+#this out more in depth)
+        elif os == 'linux':
+            call(local)#just call the path to the executable (NOT TESTED)
+        else:
+            print("Your OS is not supported so the TBB could not be automatically\n"
+                + "launched. Please report this (I'm suprised it made it this far)")
 
     def cleanUp(self, sig, currentTBB):
         print("Deleting extra files no longer needed (downloaded installers, sig, etc.)")
