@@ -8,7 +8,8 @@ import sys
 import os as OS
 import platform
 import urllib
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, call
+import hashlib
 
 class TBBUpdater:
 #The following output variables hold the expected output of running the command
@@ -61,12 +62,16 @@ sub   2048R/140C961B 2010-07-14
             print("Exiting...")
             sys.exit()
         localPath = updater.getLocalInstall()
-        if updater.upToDate(localPath, currentTBB, os):
+        if updater.upToDate(localPath, currentTBB, os, lang):
             print("Installed version is up-to-date")
             #no need to update, launch bundle
-        #else:
+        else:
+            print("Installed version is outdated, deleting and updating...")
             #updater.update()
-        #updater.launchTBB()
+        print("Cleaning up extra files...")
+        print("Launching TBB...")
+        updater.launchTBB()
+        print("Exiting...")
 
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
@@ -99,7 +104,7 @@ sub   2048R/140C961B 2010-07-14
         print("Selected version: " + versions[selection])
         return versions[selection][:-1] #chop last char (it's a /)
 
-    def upToDate(self, local, current, os): #local should be the path to local install or None
+    def upToDate(self, local, current, os, lang): #local should be the path to local install or None
         if local == None:               #if no local install exists. current should be the
             return False                #path to the current version download
         if os == 'win':
@@ -109,8 +114,11 @@ sub   2048R/140C961B 2010-07-14
                 + "(don't worry the signature has been verified) and then enter the\n"
                 + "path to that install here: (hint: use the desktop, then drag n drop here)")
             path = raw_input("-> ")
+            return self.generateHash(path) == self.generateHash(local)
         elif os == 'mac':
             print "Unzipping selected verison of the TBB"
+            call("unzip " + current, shell=True)#extract to current dir
+            return self.generateHash("TorBrowserBundle_"+ lang +".app") == self.generateHash(local)
         elif os == 'linux':
             print "Unarchiving selected version of the TBB"
         else:
