@@ -70,6 +70,9 @@ sub   2048R/140C961B 2010-07-14
     def launchTBB(self, local, os):
         #launch TBB @ path `local`
 
+    def cleanUp(self, sig, currentTBB):
+        #delete files used in the install process (archive downloaded, installer, etc.)
+
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
                        + "a simple way to do this is to drag the file onto this terminal\n"
