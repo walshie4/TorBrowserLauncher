@@ -60,9 +60,9 @@ sub   2048R/140C961B 2010-07-14
             sys.exit()
         newPath = self.install(currentTBB, os, lang)
         localPath = self.getLocalInstall()
-        self.update(localPath, newPath)
+        installPath = self.update(localPath, newPath)
         self.cleanUp(sig, currentTBB)
-        self.launchTBB(localPath, os)
+        self.launchTBB(installPath, os)
         print("Exiting...")
 
     def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
@@ -88,13 +88,18 @@ sub   2048R/140C961B 2010-07-14
         if local == None: #no local install
             location = raw_input("Where would you like your TBB install located?\n"
                     + "Simpliest method for this is drag n drop a folder\n-> ").rstrip()
+            if not location.endswith('/'):
+                location += '/'
             print("Moving current version to \"" + location + "\"")
             move(current, location)
+            path = current.split('/')
+            return location + path[len(path)-1]
         else:
             print("Deleting local install found @ \"" + local + "\"")
             remove(local)
             print("Moving current version to same location as local install was located")
             move(current, local)#move current to location of where local was
+            return local
 
     def launchTBB(self, local, os):
         print("Launching TBB...")
