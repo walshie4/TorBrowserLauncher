@@ -78,11 +78,12 @@ sub   2048R/140C961B 2010-07-14
             return raw_input("-> ").rstrip()
         elif os == 'mac':#Mac
             print("Extracting the .app from the downloaded (and verified) .zip file")
-            call("unzip " + currentTBB + " > /dev/null", shell=True)#extract using the shell
+            call("unzip " + currentTBB + " > /dev/null", shell=True)#extract
             return OS.getcwd() + "/TorBrowserBundle_" + lang + ".app"
         elif os == 'linux':#linux
             print("Extracting app from the downloaded (and verified) archive")
-            #TODO
+            call("tar -xvJf " + currentTBB + " > /dev/null", shell = True)#extract
+            return OS.getcwd() + "/tor-browser_" + lang#return dir with TBB in it
         else:
             print("Your OS is not currently supported. Please report this issue, and\n"
                 + "it will be fixed shortly")
@@ -114,10 +115,10 @@ sub   2048R/140C961B 2010-07-14
         elif os == 'mac':
             call("open " + local, shell=True)#this hack should run the TBB .app
 #although this also creates a security voulnerability using user input data in a shell command.
-#Inital testing makes me believe it is safe (It would be appreciated if someone further check
-#this out more in depth)
+#Inital testing makes me believe it is safe. I will look into this further soon.
         elif os == 'linux':
-            call(local)#just call the path to the executable (NOT TESTED)
+            call(local + '/.start-tor-browser')
+            #call the start script inside the install dir
         else:
             print("Your OS is not supported so the TBB could not be automatically\n"
                 + "launched. Please report this (I'm suprised it made it this far)")
