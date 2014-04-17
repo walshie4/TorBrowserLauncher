@@ -66,6 +66,10 @@ sub   2048R/140C961B 2010-07-14
         print("Exiting...")
 
     def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
+        print("WAIT! Because nothing is ever perfect, before I install the downloaded\n"
+            + "installer please read the above gpg output to verify the signature was\n"
+            + "in fact good, and verified.")
+        raw_input("Then just press enter")
         if os == 'win':#Windows...
             print("Because Windows uses an .exe install automated install cannot \n"
                 + "be done. Please run the .exe (don't worry the signature has been \n"
@@ -91,7 +95,9 @@ sub   2048R/140C961B 2010-07-14
             if not location.endswith('/'):
                 location += '/'
             print("Moving current version to \"" + location + "\"")
-            move(current, location)
+            if not '/'.join(current.split('/')[:-1]) + '/' == location:
+                #if it doesn't already happen to be in place
+                move(current, location)#move it
             path = current.split('/')
             return location + path[len(path)-1]
         else:
