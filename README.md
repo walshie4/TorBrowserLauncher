@@ -10,6 +10,12 @@ or don't mind out-sourcing this process to an open source script then this is fo
 If you have any issues please report them here or send me an email so I can fix them. Hope this 
 script helps!
 
+###Dependencies
+* BeautifulSoup
+* Requests
+* GPG (Installed on your machine)
+* Python 2
+
 ###Releases
 * [Mac](https://github.com/walshie4/TorBrowserLauncher/releases/tag/V0.2.2-Mac)
 * [Linux](https://github.com/walshie4/TorBrowserLauncher/releases/tag/V0.2.2-Linux)

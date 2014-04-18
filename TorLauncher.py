@@ -66,9 +66,9 @@ sub   2048R/140C961B 2010-07-14
         print("Exiting...")
 
     def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
-        print("WAIT! Because nothing is ever perfect, before I install the downloaded\n"
+        print("\nWAIT! Because nothing is ever perfect, before I install the downloaded\n"
             + "installer please read the above gpg output to verify the signature was\n"
-            + "in fact good, and verified.")
+            + "in fact good, and verified.\n")
         raw_input("Then just press enter")
         if os == 'win':#Windows...
             print("Because Windows uses an .exe install automated install cannot \n"
@@ -93,6 +93,8 @@ sub   2048R/140C961B 2010-07-14
         if local == None: #no local install
             location = raw_input("Where would you like your TBB install located?\n"
                     + "Simpliest method for this is drag n drop a folder\n-> ").rstrip()
+            if location.startswith('\'') or location.startswith('"') and location.endswith('\'') or location.endswith('"'):
+                    location = location[1:-1]#cut the extra quotes off
             if not location.endswith('/'):
                 location += '/'
             print("Moving current version to \"" + location + "\"")
@@ -117,7 +119,7 @@ sub   2048R/140C961B 2010-07-14
 #although this also creates a security voulnerability using user input data in a shell command.
 #Inital testing makes me believe it is safe. I will look into this further soon.
         elif os == 'linux':
-            call(local + '/.start-tor-browser')
+            call("sh " + local + '/start-tor-browser', shell=True)
             #call the start script inside the install dir
         else:
             print("Your OS is not supported so the TBB could not be automatically\n"
@@ -252,15 +254,27 @@ sub   2048R/140C961B 2010-07-14
             getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x140C961B"
             (stdout, stderr) = Popen(getKeyCmd, stdout=PIPE, shell=True).communicate()
             print stdout
-            if not stdout == self.LINUX_OUPUT:#linux key is not valid
+            print("Verifying the linux key fingerprint")
+            verifyKeyCmd = "gpg --fingerprint 0x140C961B"
+            (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
+            print stdout
+            if not stdout.replace(' ','') == self.LINUX_OUTPUT.replace(' ',''):#linux key is not valid
                 raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying the key needed to verify the signature")
         verifyKeyCmd = "gpg --fingerprint 0x416F061063FEE659"
         (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
-        if not stdout == self.OUTPUT:#key is not valid (for non-linux)
+        if not stdout.replace(' ','') == self.OUTPUT.replace(' ',''):#key is not valid (non-linux key)
             raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying signature file...")
-        verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
+        if os == 'win':
+            verifySigCmd = "gpg --verify " + currentTBB + ".asc " + currentTBB
+        elif os == 'mac':
+            verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
+        elif os == 'linux':
+            verifySigCmd = "gpg --verify " + currentTBB + ".asc " + currentTBB
+        else:
+            print("Your OS is not supported. Because of this the gpg signature could\n"
+                + "not be verified, please report this, and it will be fixed soon!")
         (stdout, stderr) = Popen(verifySigCmd, stdout=PIPE, shell=True).communicate()
         print stdout
         if stdout.find("Good signature"):
