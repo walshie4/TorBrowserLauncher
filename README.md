@@ -10,6 +10,11 @@ or don't mind out-sourcing this process to an open source script then this is fo
 If you have any issues please report them or send me an email so I can fix them. Hope this 
 script helps!
 
+###Dependencies
+* BeautifulSoup
+* Requests
+* Python 2
+
 ###Releases
 As of right now only a Mac OS X release is available, other releases should be available soon.
 Also if you have access to a Windows machine and would like to help in testing please let me
