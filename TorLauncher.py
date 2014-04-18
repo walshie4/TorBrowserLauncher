@@ -255,8 +255,7 @@ sub   2048R/140C961B 2010-07-14
             print("Verifying the linux key fingerprint")
             verifyKeyCmd = "gpg --fingerprint 0x140C961B"
             (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
-            print stdout.replace(' ','')
-            print self.LINUX_OUTPUT.replace(' ','')
+            print stdout
             if not stdout.replace(' ','') == self.LINUX_OUTPUT.replace(' ',''):#linux key is not valid
                 raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying the key needed to verify the signature")
