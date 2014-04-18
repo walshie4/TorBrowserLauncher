@@ -252,12 +252,17 @@ sub   2048R/140C961B 2010-07-14
             getKeyCmd = "gpg --keyserver x-hkp://pool.sks-keyservers.net --recv-keys 0x140C961B"
             (stdout, stderr) = Popen(getKeyCmd, stdout=PIPE, shell=True).communicate()
             print stdout
-            if not stdout == self.LINUX_OUTPUT:#linux key is not valid
+            print("Verifying the linux key fingerprint")
+            verifyKeyCmd = "gpg --fingerprint 0x140C961B"
+            (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
+            print stdout.replace(' ','')
+            print self.LINUX_OUTPUT.replace(' ','')
+            if not stdout.replace(' ','') == self.LINUX_OUTPUT.replace(' ',''):#linux key is not valid
                 raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying the key needed to verify the signature")
         verifyKeyCmd = "gpg --fingerprint 0x416F061063FEE659"
         (stdout, stderr) = Popen(verifyKeyCmd, stdout=PIPE, shell=True).communicate()
-        if not stdout == self.OUTPUT:#key is not valid (for non-linux)
+        if not stdout.replace(' ','') == self.OUTPUT.replace(' ',''):#key is not valid (non-linux key)
             raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying signature file...")
         verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
