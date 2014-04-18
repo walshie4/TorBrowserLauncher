@@ -66,9 +66,9 @@ sub   2048R/140C961B 2010-07-14
         print("Exiting...")
 
     def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
-        print("WAIT! Because nothing is ever perfect, before I install the downloaded\n"
+        print("\nWAIT! Because nothing is ever perfect, before I install the downloaded\n"
             + "installer please read the above gpg output to verify the signature was\n"
-            + "in fact good, and verified.")
+            + "in fact good, and verified.\n")
         raw_input("Then just press enter")
         if os == 'win':#Windows...
             print("Because Windows uses an .exe install automated install cannot \n"
@@ -93,6 +93,8 @@ sub   2048R/140C961B 2010-07-14
         if local == None: #no local install
             location = raw_input("Where would you like your TBB install located?\n"
                     + "Simpliest method for this is drag n drop a folder\n-> ").rstrip()
+            if location.startswith('\'') or location.startswith('"') and location.endswith('\'') or location.endswith('"'):
+                    location = location[1:-1]#cut the extra quotes off
             if not location.endswith('/'):
                 location += '/'
             print("Moving current version to \"" + location + "\"")
@@ -117,7 +119,7 @@ sub   2048R/140C961B 2010-07-14
 #although this also creates a security voulnerability using user input data in a shell command.
 #Inital testing makes me believe it is safe. I will look into this further soon.
         elif os == 'linux':
-            call(local + '/.start-tor-browser')
+            call("sh " + local + '/start-tor-browser', shell=True)
             #call the start script inside the install dir
         else:
             print("Your OS is not supported so the TBB could not be automatically\n"
