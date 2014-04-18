@@ -264,7 +264,15 @@ sub   2048R/140C961B 2010-07-14
         if not stdout.replace(' ','') == self.OUTPUT.replace(' ',''):#key is not valid (non-linux key)
             raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying signature file...")
-        verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
+        if os == 'win':
+            #TODO do win stuff
+        elif os == 'mac':
+            verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
+        elif os == 'linux':
+            verifySigCmd = "gpg --verify " + currentTBB + ".asc " + currentTBB
+        else:
+            print("Your OS is not supported. Because of this the gpg signature could\n"
+                + "not be verified, please report this, and it will be fixed soon!")
         (stdout, stderr) = Popen(verifySigCmd, stdout=PIPE, shell=True).communicate()
         print stdout
         if stdout.find("Good signature"):
