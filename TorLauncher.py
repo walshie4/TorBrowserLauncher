@@ -265,7 +265,7 @@ sub   2048R/140C961B 2010-07-14
             raise ValueError("The key you have does not match the known fingerprint!")
         print("Verifying signature file...")
         if os == 'win':
-            #TODO do win stuff
+            verifySigCmd = "gpg --verify " + currentTBB + ".asc " + currentTBB
         elif os == 'mac':
             verifySigCmd = "gpg --verify " + currentTBB + "{.asc,}"
         elif os == 'linux':
