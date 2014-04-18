@@ -13,6 +13,7 @@ script helps!
 ###Dependencies
 * BeautifulSoup
 * Requests
+* GPG (Installed on your machine)
 * Python 2
 
 ###Releases
