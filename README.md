@@ -11,6 +11,8 @@ If you have any issues please report them here or send me an email so I can fix 
 script helps!
 
 ###Releases
+* [Mac](https://github.com/walshie4/TorBrowserLauncher/releases/tag/V0.2.2-Mac)
+* [Linux](https://github.com/walshie4/TorBrowserLauncher/releases/tag/V0.2.2-Linux)
 As of right now only Linux, and Mac OS X releases are available.
 If you have access to a Windows machine and would like to help in testing please let me
 know.
