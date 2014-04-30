@@ -1,6 +1,6 @@
 test:
-	python TorLauncher.py#run script
+	python TorLauncher.py
 
 clean:
-	rm TorBrowser-* tor-browser-linux* torbrowser-install-*#delete dl'd files
+	rm -f TorBrowser-* tor-browser-linux* torbrowser-install-*
 
