@@ -11,6 +11,7 @@ import urllib
 from subprocess import Popen, PIPE, call
 from shutil import move
 from shutil import rmtree as remove
+from shutil import copytree
 
 class TBBUpdater:
 #The following output variables hold the expected output of running the command
@@ -33,6 +34,7 @@ sub   2048R/A2499719 2010-07-14
 sub   2048R/140C961B 2010-07-14
 
 """
+    mount = None#mount for mac install
     def run(self): #run updater
                                 #Order of operations:   (implemented?)
                                 #get sys info (os, arch)
@@ -58,14 +60,15 @@ sub   2048R/140C961B 2010-07-14
         if not self.verifySignature(currentTBB, os):#if verification fails
             print("Exiting...")
             sys.exit()
-        newPath = self.install(currentTBB, os, lang)
+        newPath = self.install(currentTBB, os, lang, current)
         localPath = self.getLocalInstall()
-        installPath = self.update(localPath, newPath)
-        self.cleanUp(sig, currentTBB)
+        installPath = self.update(localPath, newPath, os)
         self.launchTBB(installPath, os)
+        print("Cleaning up...")
+        self.cleanUp(sig, currentTBB, os)
         print("Exiting...")
 
-    def install(self, currentTBB, os, lang):#currentTBB should a path to the DL'd installer
+    def install(self, currentTBB, os, lang, version):#currentTBB should a path to the DL'd installer
         print("\nWAIT! Because nothing is ever perfect, before I install the downloaded\n"
             + "installer please read the above gpg output to verify the signature was\n"
             + "in fact good, and verified.\n")
@@ -77,9 +80,11 @@ sub   2048R/140C961B 2010-07-14
                 + "Hint: install it to the desktop and then drag n drop here")
             return raw_input("-> ").rstrip()
         elif os == 'mac':#Mac
-            print("Extracting the .app from the downloaded (and verified) .zip file")
-            call("unzip " + currentTBB + " > /dev/null", shell=True)#extract
-            return OS.getcwd() + "/TorBrowserBundle_" + lang + ".app"
+            print("Extracting the .app from the downloaded (and verified) .dmg file")
+            self.mount = (OS.getcwd() + "/tempdir")
+            OS.mkdir(self.mount)
+            call("hdiutil attach -mountpoint " + self.mount + " " + currentTBB, shell = True)#mount that sucker
+            return self.mount + "/TorBrowser.app"
         elif os == 'linux':#linux
             print("Extracting app from the downloaded (and verified) archive")
             call("tar -xvJf " + currentTBB + " > /dev/null", shell = True)#extract
@@ -89,7 +94,7 @@ sub   2048R/140C961B 2010-07-14
                 + "it will be fixed shortly")
             sys.exit()
 
-    def update(self, local, current):
+    def update(self, local, current, os):
         if local == None: #no local install
             location = raw_input("Where would you like your TBB install located?\n"
                     + "Simpliest method for this is drag n drop a folder\n-> ").rstrip()
@@ -100,14 +105,20 @@ sub   2048R/140C961B 2010-07-14
             print("Moving current version to \"" + location + "\"")
             if not '/'.join(current.split('/')[:-1]) + '/' == location:
                 #if it doesn't already happen to be in place
-                move(current, location)#move it
+                if(os == "mac"):
+                    copytree(current, location + "TorBrowser.app/")#move it
+                else:
+                    move(current, location)#move it
             path = current.split('/')
             return location + path[len(path)-1]
         else:
             print("Deleting local install found @ \"" + local + "\"")
             remove(local)
             print("Moving current version to same location as local install was located")
-            move(current, local)#move current to location of where local was
+            if(os == 'mac'):
+                copytree(current, local)
+            else:
+                move(current, local)#move current to location of where local was
             return local
 
     def launchTBB(self, local, os):
@@ -125,10 +136,14 @@ sub   2048R/140C961B 2010-07-14
             print("Your OS is not supported so the TBB could not be automatically\n"
                 + "launched. Please report this (I'm suprised it made it this far)")
 
-    def cleanUp(self, sig, currentTBB):
+    def cleanUp(self, sig, currentTBB, os):
         print("Deleting extra files no longer needed (downloaded installers, sig, etc.)")
         OS.remove(currentTBB)
         OS.remove(sig)
+        if(os == 'mac'):
+            if(not self.mount == None):
+                call("hdiutil detach " + self.mount, shell = True)#dismount
+                remove(self.mount)
 
     def getLocalInstall(self):
         localPath = raw_input("Please enter the path to the local TBB install\n"
@@ -212,8 +227,8 @@ sub   2048R/140C961B 2010-07-14
             url += suffix
             return url
         elif os == 'mac': #build mac DL URL
-            url += 'TorBrowserBundle-'
-            suffix = '.zip'
+            url += 'TorBrowser-'
+            suffix = '.dmg'
             url += version + '-osx32_'
             url += lang
             url += suffix
