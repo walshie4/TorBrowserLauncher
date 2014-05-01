@@ -3,4 +3,5 @@ test:
 
 clean:
 	rm -f TorBrowser-* tor-browser-linux* torbrowser-install-*
+	rm -rf tempdir
 
